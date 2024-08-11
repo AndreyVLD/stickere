@@ -1,1 +1,1 @@
-Sticker Management Application
+# Sticker Management Application
