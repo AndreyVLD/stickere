@@ -1,12 +1,15 @@
-use rusqlite::{params, Connection, Result};
-fn main() {
-    let conn = Connection::open("db/my_database.db")
-        .expect("Database Connection failed");
+mod db;
+mod ui;
 
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS person (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            age INTEGER
-            )", ()).expect("Table creation failed");
+use crate::db::DbHandler;
+use crate::ui::App;
+
+fn main() -> eframe::Result {
+    let db = DbHandler::new("db/stick.db");
+
+    let native_options = eframe::NativeOptions::default();
+    eframe::run_native("My egui App",
+                       native_options,
+                       Box::new(|cc| Ok(Box::new(App::new(cc, db)))))
 }
+
