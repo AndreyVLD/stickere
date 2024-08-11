@@ -3,7 +3,7 @@ use crate::db::DbHandler;
 
 pub struct App {
     db_handler: DbHandler,
-    checkboxes: Vec<CheckboxItem>,
+    checkboxes: Vec<Card>,
 }
 
 impl App {
@@ -15,9 +15,9 @@ impl App {
         Self {
             db_handler,
             checkboxes: vec![
-                CheckboxItem::new("Check 1"),
-                CheckboxItem::new("Check 2"),
-                CheckboxItem::new("Check 3"),
+                Card::new("Check 1"),
+                Card::new("Check 2"),
+                Card::new("Check 3"),
             ],
         }
     }
@@ -39,12 +39,12 @@ impl eframe::App for App {
 // TODO: Add cards from this checkbox item
 // TODO: Add collections -> left side bar
 // TODO: On click collection -> retrieve all cards from that collection
-pub struct CheckboxItem {
+pub struct Card {
     pub label: String,
     pub checked: bool,
 }
 
-impl CheckboxItem {
+impl Card {
     pub fn new(label: &str) -> Self {
         Self {
             label: label.to_string(),
@@ -56,7 +56,7 @@ impl CheckboxItem {
         let checkbox = ui.checkbox(&mut self.checked, &self.label);
 
         if checkbox.changed() {
-            println!("Box {} was pressed it is now {}", self.label, self.checked)
+            println!("Card {} was pressed it is now {}", self.label, self.checked)
         }
     }
 }
