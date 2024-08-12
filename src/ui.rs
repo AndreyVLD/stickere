@@ -1,4 +1,6 @@
 use eframe::egui;
+use eframe::egui::{Vec2};
+
 use crate::db::DbHandler;
 
 pub struct App {
@@ -15,11 +17,94 @@ impl App {
         Self {
             db_handler,
             checkboxes: vec![
-                Card::new("Check 1"),
-                Card::new("Check 2"),
-                Card::new("Check 3"),
+                Card::new("Check 1", 1),
+                Card::new("Check 2", 2),
+                Card::new("Check 3", 3),
+                Card::new("Check 1", 4),
+                Card::new("Check 2", 5),
+                Card::new("Check 3", 6),
+                Card::new("Check 1", 7),
+                Card::new("Check 2", 8),
+                Card::new("Check 3", 9),
+                Card::new("Check 1", 10),
+                Card::new("Check 2", 11),
+                Card::new("Check 3", 12),
+                Card::new("Check 1", 13),
+                Card::new("Check 2", 14),
+                Card::new("Check 3", 15),
+                Card::new("Check 1", 16),
+                Card::new("Check 2", 17),
+                Card::new("Check 3", 1),
+                Card::new("Check 1", 1),
+                Card::new("Check 2", 1),
+                Card::new("Check 3", 1),
+                Card::new("Check 1", 1),
+                Card::new("Check 2", 1),
+                Card::new("Check 3", 1),
+                Card::new("Check 1", 1),
+                Card::new("Check 2", 1),
+                Card::new("Check 3", 1),
             ],
         }
+    }
+
+    fn card_grid(&mut self, ui: &mut egui::Ui) {
+        let available_width = ui.available_width();
+        let item_width = 60.0;
+        let spacing = 5.0;
+        let num_columns = ((available_width + spacing) / (item_width + spacing)).floor() as usize;
+
+        egui::ScrollArea::vertical()
+            .auto_shrink([false; 2])
+            .show(ui, |ui| {
+                egui::Grid::new("Checkbox")
+                    .min_col_width(item_width)
+                    .spacing([spacing, spacing])
+                    .striped(true)
+                    .show(ui, |ui| {
+                        for (i, check_box) in (&mut self.checkboxes).into_iter().enumerate() {
+                            check_box.ui(ui);
+                            if num_columns != 0 && i % num_columns == num_columns - 1 {
+                                ui.end_row()
+                            }
+                        }
+                    });
+            });
+    }
+
+    fn right_section(&mut self, ui: &mut egui::Ui) {
+        ui.vertical_centered(|ui| {
+            ui.label("Sorting options");
+            ui.separator();
+            self.card_grid(ui);
+        });
+    }
+
+    fn left_section(&mut self, ui: &mut egui::Ui) {
+        ui.allocate_ui_with_layout(
+            Vec2::new(ui.available_width(), ui.available_height()),
+            egui::Layout::top_down(egui::Align::LEFT),
+            |ui| {
+                ui.set_max_width(150.0);
+
+                ui.vertical(|ui| {
+                    ui.label("Input");
+                    ui.separator();
+
+                    egui::ScrollArea::vertical()
+                        .id_source("Collection Name")
+                        .auto_shrink([true; 2])
+                        .show(ui, |ui| {
+                            ui.button("Collection Nameddddd:");
+                            ui.button("Collection Name:");
+                            ui.button("Collection Name:");
+                            ui.button("Collection Name:");
+                            ui.button("Collection Name:");
+                            ui.button("Collection Name:");
+                        });
+                });
+            },
+        );
     }
 }
 
@@ -29,34 +114,40 @@ impl eframe::App for App {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("My Application");
             ui.separator();
-            for check_box in &mut self.checkboxes {
-                check_box.ui(ui)
-            }
-            ui.separator();
+            let available_height = ui.available_height();
+
+            ui.horizontal(|ui| {
+                ui.set_min_height(available_height);
+                self.left_section(ui);
+                ui.separator();
+                self.right_section(ui);
+            });
         });
     }
 }
-// TODO: Add cards from this checkbox item
-// TODO: Add collections -> left side bar
-// TODO: On click collection -> retrieve all cards from that collection
+
 pub struct Card {
     pub label: String,
+    pub id: u32,
     pub checked: bool,
 }
 
 impl Card {
-    pub fn new(label: &str) -> Self {
+    pub fn new(label: &str, id: u32) -> Self {
         Self {
             label: label.to_string(),
+            id,
             checked: false,
         }
     }
 
     pub fn ui(&mut self, ui: &mut egui::Ui) {
-        let checkbox = ui.checkbox(&mut self.checked, &self.label);
-
-        if checkbox.changed() {
-            println!("Card {} was pressed it is now {}", self.label, self.checked)
-        }
+        ui.vertical_centered(|ui| {
+            ui.label(&self.label); // Place the label on top
+            let checkbox = ui.checkbox(&mut self.checked, ""); // Checkbox with no label
+            if checkbox.changed() {
+                println!("Checkbox '{}' was pressed. Checked: {}", self.label, self.checked);
+            }
+        });
     }
 }
