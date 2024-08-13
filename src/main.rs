@@ -1,5 +1,7 @@
 mod db;
 mod ui;
+mod card;
+mod collection;
 
 use crate::db::DbHandler;
 use crate::ui::App;

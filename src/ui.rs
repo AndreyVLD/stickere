@@ -2,10 +2,13 @@ use eframe::egui;
 use eframe::egui::{Vec2};
 
 use crate::db::DbHandler;
+use crate::card::Card;
+use crate::collection::Collection;
 
 pub struct App {
     db_handler: DbHandler,
-    checkboxes: Vec<Card>,
+    cards: Vec<Card>,
+    collections: Vec<Collection>,
 }
 
 impl App {
@@ -14,37 +17,11 @@ impl App {
         // Restore app state using cc. storage (requires the "persistence" feature).
         // Use the cc. gl (a glow::Context) to create graphics shaders and buffers that you can use
         // for e.g. egui::PaintCallback.
+        let collections = db_handler.get_collections();
         Self {
             db_handler,
-            checkboxes: vec![
-                Card::new("Check 1", 1),
-                Card::new("Check 2", 2),
-                Card::new("Check 3", 3),
-                Card::new("Check 1", 4),
-                Card::new("Check 2", 5),
-                Card::new("Check 3", 6),
-                Card::new("Check 1", 7),
-                Card::new("Check 2", 8),
-                Card::new("Check 3", 9),
-                Card::new("Check 1", 10),
-                Card::new("Check 2", 11),
-                Card::new("Check 3", 12),
-                Card::new("Check 1", 13),
-                Card::new("Check 2", 14),
-                Card::new("Check 3", 15),
-                Card::new("Check 1", 16),
-                Card::new("Check 2", 17),
-                Card::new("Check 3", 1),
-                Card::new("Check 1", 1),
-                Card::new("Check 2", 1),
-                Card::new("Check 3", 1),
-                Card::new("Check 1", 1),
-                Card::new("Check 2", 1),
-                Card::new("Check 3", 1),
-                Card::new("Check 1", 1),
-                Card::new("Check 2", 1),
-                Card::new("Check 3", 1),
-            ],
+            cards: vec![],
+            collections,
         }
     }
 
@@ -62,8 +39,8 @@ impl App {
                     .spacing([spacing, spacing])
                     .striped(true)
                     .show(ui, |ui| {
-                        for (i, check_box) in (&mut self.checkboxes).into_iter().enumerate() {
-                            check_box.ui(ui);
+                        for (i, check_box) in self.cards.iter_mut().enumerate() {
+                            check_box.ui(ui, &self.db_handler);
                             if num_columns != 0 && i % num_columns == num_columns - 1 {
                                 ui.end_row()
                             }
@@ -92,15 +69,12 @@ impl App {
                     ui.separator();
 
                     egui::ScrollArea::vertical()
-                        .id_source("Collection Name")
+                        .id_source("CollectionsArea")
                         .auto_shrink([true; 2])
                         .show(ui, |ui| {
-                            ui.button("Collection Nameddddd:");
-                            ui.button("Collection Name:");
-                            ui.button("Collection Name:");
-                            ui.button("Collection Name:");
-                            ui.button("Collection Name:");
-                            ui.button("Collection Name:");
+                            for collection in &self.collections {
+                                collection.ui(ui, &mut self.cards, &self.db_handler);
+                            }
                         });
                 });
             },
@@ -122,32 +96,6 @@ impl eframe::App for App {
                 ui.separator();
                 self.right_section(ui);
             });
-        });
-    }
-}
-
-pub struct Card {
-    pub label: String,
-    pub id: u32,
-    pub checked: bool,
-}
-
-impl Card {
-    pub fn new(label: &str, id: u32) -> Self {
-        Self {
-            label: label.to_string(),
-            id,
-            checked: false,
-        }
-    }
-
-    pub fn ui(&mut self, ui: &mut egui::Ui) {
-        ui.vertical_centered(|ui| {
-            ui.label(&self.label); // Place the label on top
-            let checkbox = ui.checkbox(&mut self.checked, ""); // Checkbox with no label
-            if checkbox.changed() {
-                println!("Checkbox '{}' was pressed. Checked: {}", self.label, self.checked);
-            }
         });
     }
 }
