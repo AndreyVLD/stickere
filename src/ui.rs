@@ -27,9 +27,12 @@ impl App {
 
     fn card_grid(&mut self, ui: &mut egui::Ui) {
         let available_width = ui.available_width();
-        let item_width = 60.0;
+        let item_width = 40.0;
         let spacing = 5.0;
         let num_columns = ((available_width + spacing) / (item_width + spacing)).floor() as usize;
+
+        ui.label("Cards:");
+        ui.add_space(5.0);
 
         egui::ScrollArea::vertical()
             .auto_shrink([false; 2])
@@ -50,8 +53,8 @@ impl App {
     }
 
     fn right_section(&mut self, ui: &mut egui::Ui) {
-        ui.vertical_centered(|ui| {
-            ui.label("Sorting options");
+        ui.vertical(|ui| {
+            ui.label("Filter options: ");
             ui.separator();
             self.card_grid(ui);
         });
@@ -65,13 +68,22 @@ impl App {
                 ui.set_max_width(150.0);
 
                 ui.vertical(|ui| {
-                    ui.label("Input");
+                    ui.horizontal(|ui| {
+                        ui.label("Input: ");
+                        ui.label("Input");
+                        ui.label("Input");
+                    });
+
                     ui.separator();
 
                     egui::ScrollArea::vertical()
                         .id_source("CollectionsArea")
-                        .auto_shrink([true; 2])
+                        .auto_shrink([false; 2])
                         .show(ui, |ui| {
+                            ui.label("Collections:");
+
+                            ui.add_space(5.0);
+
                             for collection in &self.collections {
                                 collection.ui(ui, &mut self.cards, &self.db_handler);
                             }
