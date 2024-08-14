@@ -19,8 +19,7 @@ impl DbHandler {
             "CREATE TABLE IF NOT EXISTS collections (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            size INTEGER,
-            description TEXT
+            size INTEGER
             )", ()).expect("Table creation collections failed");
 
         conn.execute(
@@ -74,5 +73,40 @@ impl DbHandler {
             .expect("Statement Failed");
 
         stmt.execute((status, id)).expect("Query Failed");
+    }
+
+    fn generate_cards(&mut self, collection_id: u32, size: u32) -> Result<(), rusqlite::Error> {
+        let tx = self.connection.transaction()?;
+
+        {
+            let mut stmt = tx.prepare("INSERT INTO cards (collection_id, card_number, collected) \
+                                                     VALUES (?1, ?2, false)")?;
+
+            for label in 1..=size {
+                stmt.execute((collection_id, label))?;
+            }
+        }
+        tx.commit()?;
+
+        Ok(())
+    }
+
+    pub fn add_collection(&mut self, name: &String, size: u32) -> u32 {
+        let last_id: u32 = {
+            let mut stmt = self.connection
+                .prepare("INSERT INTO collections (name, size) VALUES (?1,?2)")
+                .expect("Statement Failed");
+            stmt.execute((name, size)).expect("Query Failed");
+
+            let mut stmt = self.connection
+                .prepare("SELECT last_insert_rowid()")
+                .expect("Statement Failed");
+
+            stmt.query_row([], |row| {
+                row.get(0)
+            }).expect("Query Failed")
+        };
+        self.generate_cards(last_id, size).expect("Transaction Failed");
+        last_id
     }
 }

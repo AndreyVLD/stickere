@@ -16,7 +16,6 @@ impl Collection {
 
     pub fn ui(&self, ui: &mut egui::Ui, cards: &mut Vec<Card>, db_handler: &DbHandler) {
         if ui.button(&self.name).clicked() {
-            println!("Collection {} is clicked", self.id);
             *cards = db_handler.get_cards_from_collection(self.id);
         }
     }

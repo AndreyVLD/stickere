@@ -22,7 +22,6 @@ impl Card {
             ui.label(&self.label.to_string());
             let checkbox = ui.checkbox(&mut self.checked, "");
             if checkbox.changed() {
-                println!("Checkbox '{}' was pressed. Checked: {}", self.id, self.checked);
                 db_handler.update_card(self.id, self.checked);
             }
         });

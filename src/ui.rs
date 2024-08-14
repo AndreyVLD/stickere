@@ -4,11 +4,13 @@ use eframe::egui::{Vec2};
 use crate::db::DbHandler;
 use crate::card::Card;
 use crate::collection::Collection;
+use crate::collection_adder::CollectionAdder;
 
 pub struct App {
     db_handler: DbHandler,
     cards: Vec<Card>,
     collections: Vec<Collection>,
+    collection_adder: CollectionAdder,
 }
 
 impl App {
@@ -22,6 +24,7 @@ impl App {
             db_handler,
             cards: vec![],
             collections,
+            collection_adder: CollectionAdder::new(),
         }
     }
 
@@ -55,6 +58,8 @@ impl App {
     fn right_section(&mut self, ui: &mut egui::Ui) {
         ui.vertical(|ui| {
             ui.label("Filter options: ");
+            ui.add_space(5.0);
+
             ui.separator();
             self.card_grid(ui);
         });
@@ -68,11 +73,7 @@ impl App {
                 ui.set_max_width(150.0);
 
                 ui.vertical(|ui| {
-                    ui.horizontal(|ui| {
-                        ui.label("Input: ");
-                        ui.label("Input");
-                        ui.label("Input");
-                    });
+                    self.collection_adder.ui(ui, &mut self.collections, &mut self.db_handler);
 
                     ui.separator();
 
