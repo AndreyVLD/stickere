@@ -3,6 +3,7 @@ mod ui;
 mod card;
 mod collection;
 mod collection_adder;
+mod collection_settings;
 
 use eframe::egui::{pos2, vec2, ViewportBuilder};
 use crate::db::DbHandler;

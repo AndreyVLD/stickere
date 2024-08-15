@@ -4,14 +4,14 @@ use crate::db::DbHandler;
 use crate::card::Card;
 use crate::collection::Collection;
 use crate::collection_adder::CollectionAdder;
+use crate::collection_settings::CollectionSettings;
 
 pub struct App {
     db_handler: DbHandler,
     cards: Vec<Card>,
     collections: Vec<Collection>,
     collection_adder: CollectionAdder,
-    show_collected: bool,
-    show_not_collected: bool,
+    collection_settings: CollectionSettings,
 }
 
 impl App {
@@ -26,8 +26,7 @@ impl App {
             cards: vec![],
             collections,
             collection_adder: CollectionAdder::new(),
-            show_collected: true,
-            show_not_collected: true,
+            collection_settings: CollectionSettings::new(),
         }
     }
 
@@ -41,7 +40,10 @@ impl App {
         ui.add_space(5.0);
 
         let filtered_cards_iter = self.cards.iter_mut()
-            .filter(|x| (self.show_collected && x.checked) || (self.show_not_collected && !x.checked));
+            .filter(|x| {
+                (self.collection_settings.show_collected && x.checked) ||
+                    (self.collection_settings.show_not_collected && !x.checked)
+            });
 
 
         egui::ScrollArea::vertical()
@@ -64,32 +66,8 @@ impl App {
     }
     fn right_section(&mut self, ui: &mut egui::Ui) {
         ui.vertical(|ui| {
-            ui.label("Filter cards:");
-            ui.add_space(5.0);
-
-            ui.horizontal(|ui| {
-                // Collection options aligned to the left
-                ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
-                    ui.checkbox(&mut self.show_collected, "Collected");
-                    ui.checkbox(&mut self.show_not_collected, "Not Collected");
-                });
-
-
-                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                    let delete_button = Button::new(RichText::new("❌")
-                        .color(Color32::WHITE)
-                        .font(FontId::proportional(16.0))
-                    )
-                        .fill(Color32::from_rgb(200, 0, 0));
-
-                    if ui.add_sized([30.0, 30.0], delete_button).clicked() {
-                        // Handle collection deletion logic here
-                        println!("Collection deletion button clicked!");
-                    }
-
-                    ui.label("Delete Collection");
-                });
-            });
+            ui.separator();
+            self.collection_settings.ui(ui);
             ui.separator();
             self.card_grid(ui);
         });
