@@ -1,6 +1,5 @@
 use eframe::egui;
-use eframe::egui::{Vec2};
-
+use eframe::egui::{Color32, FontId, Layout, RichText, Vec2, Button, Widget, Align};
 use crate::db::DbHandler;
 use crate::card::Card;
 use crate::collection::Collection;
@@ -11,6 +10,8 @@ pub struct App {
     cards: Vec<Card>,
     collections: Vec<Collection>,
     collection_adder: CollectionAdder,
+    show_collected: bool,
+    show_not_collected: bool,
 }
 
 impl App {
@@ -25,6 +26,8 @@ impl App {
             cards: vec![],
             collections,
             collection_adder: CollectionAdder::new(),
+            show_collected: true,
+            show_not_collected: true,
         }
     }
 
@@ -37,6 +40,10 @@ impl App {
         ui.label("Cards:");
         ui.add_space(5.0);
 
+        let filtered_cards_iter = self.cards.iter_mut()
+            .filter(|x| (self.show_collected && x.checked) || (self.show_not_collected && !x.checked));
+
+
         egui::ScrollArea::vertical()
             .auto_shrink([false; 2])
             .show(ui, |ui| {
@@ -45,8 +52,9 @@ impl App {
                     .spacing([spacing, spacing])
                     .striped(true)
                     .show(ui, |ui| {
-                        for (i, check_box) in self.cards.iter_mut().enumerate() {
+                        for (i, check_box) in filtered_cards_iter.enumerate() {
                             check_box.ui(ui, &self.db_handler);
+
                             if num_columns != 0 && i % num_columns == num_columns - 1 {
                                 ui.end_row()
                             }
@@ -54,12 +62,34 @@ impl App {
                     });
             });
     }
-
     fn right_section(&mut self, ui: &mut egui::Ui) {
         ui.vertical(|ui| {
-            ui.label("Filter options: ");
+            ui.label("Filter cards:");
             ui.add_space(5.0);
 
+            ui.horizontal(|ui| {
+                // Collection options aligned to the left
+                ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
+                    ui.checkbox(&mut self.show_collected, "Collected");
+                    ui.checkbox(&mut self.show_not_collected, "Not Collected");
+                });
+
+
+                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                    let delete_button = Button::new(RichText::new("❌")
+                        .color(Color32::WHITE)
+                        .font(FontId::proportional(16.0))
+                    )
+                        .fill(Color32::from_rgb(200, 0, 0));
+
+                    if ui.add_sized([30.0, 30.0], delete_button).clicked() {
+                        // Handle collection deletion logic here
+                        println!("Collection deletion button clicked!");
+                    }
+
+                    ui.label("Delete Collection");
+                });
+            });
             ui.separator();
             self.card_grid(ui);
         });
