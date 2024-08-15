@@ -1,10 +1,11 @@
 use eframe::egui;
-use eframe::egui::{Color32, FontId, Layout, RichText, Vec2, Button, Widget, Align};
-use crate::db::DbHandler;
+use eframe::egui::Vec2;
+
 use crate::card::Card;
 use crate::collection::Collection;
 use crate::collection_adder::CollectionAdder;
 use crate::collection_settings::CollectionSettings;
+use crate::db::DbHandler;
 
 pub struct App {
     db_handler: DbHandler,
@@ -12,6 +13,8 @@ pub struct App {
     collections: Vec<Collection>,
     collection_adder: CollectionAdder,
     collection_settings: CollectionSettings,
+    selected_collection: Option<u32>,
+    selected_collection_name: Option<String>,
 }
 
 impl App {
@@ -27,6 +30,8 @@ impl App {
             collections,
             collection_adder: CollectionAdder::new(),
             collection_settings: CollectionSettings::new(),
+            selected_collection: None,
+            selected_collection_name: None,
         }
     }
 
@@ -36,7 +41,12 @@ impl App {
         let spacing = 5.0;
         let num_columns = ((available_width + spacing) / (item_width + spacing)).floor() as usize;
 
-        ui.label("Cards:");
+        let name = match &self.selected_collection_name {
+            Some(x) => x.to_owned(),
+            None => "Cards".to_string()
+        };
+
+        ui.label(name + ":");
         ui.add_space(5.0);
 
         let filtered_cards_iter = self.cards.iter_mut()
@@ -66,8 +76,9 @@ impl App {
     }
     fn right_section(&mut self, ui: &mut egui::Ui) {
         ui.vertical(|ui| {
-            ui.separator();
-            self.collection_settings.ui(ui);
+            self.collection_settings.ui(ui, &self.db_handler, &mut self.collections,
+                                        &mut self.cards, &mut self.selected_collection,
+                                        &mut self.selected_collection_name);
             ui.separator();
             self.card_grid(ui);
         });
@@ -94,7 +105,8 @@ impl App {
                             ui.add_space(5.0);
 
                             for collection in &self.collections {
-                                collection.ui(ui, &mut self.cards, &self.db_handler);
+                                collection.ui(ui, &mut self.cards, &self.db_handler,
+                                              &mut self.selected_collection, &mut self.selected_collection_name);
                             }
                         });
                 });

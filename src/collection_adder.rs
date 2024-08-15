@@ -47,7 +47,7 @@ impl CollectionAdder {
         let name = self.collection_name.trim().to_string();
         if !name.is_empty() {
             let collection_id = db_handler.add_collection(&name, self.size);
-            collections.push(Collection::new(collection_id, name.clone(), self.size));
+            collections.push(Collection::new(collection_id, name.clone()));
 
             self.collection_name.clear();
             self.size = 0;

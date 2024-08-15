@@ -1,4 +1,4 @@
-use rusqlite::Connection;
+use rusqlite::{Connection};
 
 use crate::card::Card;
 use crate::collection::Collection;
@@ -41,8 +41,7 @@ impl DbHandler {
         let iter = stmt.query_map([], |row| {
             Ok(Collection::new(
                 row.get(0)?,
-                row.get(1)?,
-                row.get(2)?)
+                row.get(1)?)
             )
         }).expect("Query Failed");
 
@@ -108,5 +107,24 @@ impl DbHandler {
         };
         self.generate_cards(last_id, size).expect("Transaction Failed");
         last_id
+    }
+
+    pub fn delete_collection(&self, collection_id: u32) {
+        self.connection.execute("DELETE FROM cards WHERE collection_id = ?1", [collection_id])
+            .expect("Query Failed");
+        self.connection.execute("DELETE FROM collections WHERE id = ?1", [collection_id])
+            .expect("Query Failed");
+    }
+
+    pub fn get_collection_name(&self, collection_id: u32) -> String {
+        let mut stmt = self.connection
+            .prepare("SELECT name FROM collections WHERE id = ?1")
+            .expect("Statement Failed");
+
+        let name: String = stmt.query_row([collection_id], |row| {
+            row.get(0)
+        }).expect("Query Failed");
+
+        return name;
     }
 }
