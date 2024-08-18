@@ -20,7 +20,8 @@ impl DbHandler {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             size INTEGER
-            )", ()).expect("Table creation collections failed");
+            )",
+            ()).expect("Table creation collections failed");
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS cards (
@@ -121,10 +122,16 @@ impl DbHandler {
             .prepare("SELECT name FROM collections WHERE id = ?1")
             .expect("Statement Failed");
 
-        let name: String = stmt.query_row([collection_id], |row| {
+        stmt.query_row([collection_id], |row| {
             row.get(0)
-        }).expect("Query Failed");
+        }).expect("Query Failed")
+    }
 
-        return name;
+    pub fn get_max_label_for_collection(&self, collection_id: u32) -> u32 {
+        let mut stmt = self.connection.prepare(
+            "SELECT max(card_number) FROM cards WHERE collection_id = ?1"
+        ).expect("Statement Failed");
+
+        stmt.query_row([collection_id], |row| row.get(0)).unwrap_or(0)
     }
 }
