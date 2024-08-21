@@ -80,23 +80,23 @@ impl App {
 
     fn right_section(&mut self, ui: &mut Ui) {
         ui.vertical(|ui| {
-            self.collection_settings.ui(ui,
-                                        &self.db_handler,
-                                        &mut self.collections,
-                                        &mut self.cards,
-                                        &mut self.selected_collection_id,
-                                        &mut self.selected_collection_name);
+            if let Some(selected_id) = self.selected_collection_id {
+                self.collection_settings.ui(ui,
+                                            &self.db_handler,
+                                            &mut self.collections,
+                                            &mut self.cards,
+                                            &mut self.selected_collection_id,
+                                            &mut self.selected_collection_name);
 
-            let available_height = ui.available_height();
-            let card_grid_height = available_height - 75.0;
+                let available_height = ui.available_height();
+                let card_grid_height = available_height - 75.0;
 
-            ui.separator();
-            self.card_grid(ui, card_grid_height);
-
-
-            if self.selected_collection_name.is_some() {
                 ui.separator();
-                self.card_adder.ui(ui, &mut self.db_handler, self.selected_collection_id.unwrap());
+                self.card_grid(ui, card_grid_height);
+
+
+                ui.separator();
+                self.card_adder.ui(ui, &mut self.db_handler, &mut self.cards, selected_id);
             }
         });
     }

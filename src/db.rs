@@ -1,4 +1,4 @@
-use rusqlite::{Connection};
+use rusqlite::{params, Connection};
 
 use crate::card::Card;
 use crate::collection::Collection;
@@ -133,5 +133,18 @@ impl DbHandler {
         ).expect("Statement Failed");
 
         stmt.query_row([collection_id], |row| row.get(0)).unwrap_or(0)
+    }
+
+    pub fn add_card(&self, card_number: u32, collection_id: u32) -> u32 {
+        self.connection.execute("INSERT INTO cards (collection_id, card_number, collected) VALUES (?1,?2,?3)",
+                                params![collection_id,card_number,0]).expect("Query Failed");
+        
+        let mut stmt = self.connection
+            .prepare("SELECT last_insert_rowid()")
+            .expect("Statement Failed");
+
+        stmt.query_row([], |row| {
+            row.get(0)
+        }).expect("Query Failed")
     }
 }
