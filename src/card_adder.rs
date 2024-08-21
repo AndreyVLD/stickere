@@ -31,14 +31,16 @@ impl CardAdder {
                 .desired_width(200.0));
 
             if ui.button("Add Card").clicked() {
-                self.add_new_card(collection_id, db_handler);
-                // self.show_popup = true
+                match self.card_label.parse::<u32>() {
+                    Ok(label) => self.add_new_card(label, collection_id, db_handler),
+                    Err(_) => self.show_popup = true
+                }
             }
         });
     }
 
-    fn add_new_card(&self, collection_id: u32, db_handler: &mut DbHandler) {
-        println!("Add new card with label {} for collection {}", self.card_label, collection_id);
+    fn add_new_card(&self, card_number: u32, collection_id: u32, db_handler: &mut DbHandler) {
+        println!("Add new card with label {} for collection {}", card_number, collection_id);
         println!("{}", db_handler.get_max_label_for_collection(collection_id));
     }
 }

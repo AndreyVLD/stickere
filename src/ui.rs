@@ -133,24 +133,28 @@ impl App {
             },
         );
     }
+
+    fn main_layout(&mut self, ui: &mut Ui) {
+        ui.heading("My Application");
+        ui.separator();
+
+        let available_height = ui.available_height();
+
+        ui.horizontal(|ui| {
+            ui.set_min_height(available_height);
+
+            self.left_section(ui);
+            ui.separator();
+            self.right_section(ui);
+        });
+    }
 }
 
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         CentralPanel::default().show(ctx, |ui| {
-            ui.heading("My Application");
-            ui.separator();
-
-            let available_height = ui.available_height();
-
-            ui.horizontal(|ui| {
-                ui.set_min_height(available_height);
-
-                self.left_section(ui);
-                ui.separator();
-                self.right_section(ui);
-            });
+            self.main_layout(ui);
         });
     }
 }
