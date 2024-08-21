@@ -20,8 +20,7 @@ impl DbHandler {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             size INTEGER
-            )",
-            ()).expect("Table creation collections failed");
+            )", ()).expect("Table creation collections failed");
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS cards (
@@ -29,9 +28,9 @@ impl DbHandler {
              collection_id INTEGER NOT NULL,
              card_number INTEGER NOT NULL,
              collected BOOLEAN NOT NULL,
+             duplicates INTEGER DEFAULT 0,
              FOREIGN KEY (collection_id) REFERENCES collections(id)
-        )"
-            , ()).expect("Table creation cards failed");
+        )", ()).expect("Table creation cards failed");
     }
 
     pub fn get_collections(&self) -> Vec<Collection> {
@@ -60,6 +59,7 @@ impl DbHandler {
                     row.get(2)?,
                     row.get(0)?,
                     row.get(3)?,
+                    row.get(4)?,
                 )
             )
         }).expect("Query Failed");
@@ -138,7 +138,7 @@ impl DbHandler {
     pub fn add_card(&self, card_number: u32, collection_id: u32) -> u32 {
         self.connection.execute("INSERT INTO cards (collection_id, card_number, collected) VALUES (?1,?2,?3)",
                                 params![collection_id,card_number,0]).expect("Query Failed");
-        
+
         let mut stmt = self.connection
             .prepare("SELECT last_insert_rowid()")
             .expect("Statement Failed");
@@ -146,5 +146,10 @@ impl DbHandler {
         stmt.query_row([], |row| {
             row.get(0)
         }).expect("Query Failed")
+    }
+
+    pub fn update_card_duplicates(&self, card: &mut Card) {
+        self.connection.execute("UPDATE cards SET duplicates = ?1 WHERE id = ?2", [card.duplicates, card.id])
+            .expect("Query Failed");
     }
 }

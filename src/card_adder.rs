@@ -51,6 +51,6 @@ impl CardAdder {
 
     fn add_new_card(&self, card_number: u32, collection_id: u32, db_handler: &mut DbHandler, cards: &mut Vec<Card>) {
         let card_id = db_handler.add_card(card_number, collection_id);
-        cards.push(Card::new(card_number, card_id, false));
+        cards.push(Card::new(card_number, card_id, false, 0));
     }
 }
