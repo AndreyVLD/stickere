@@ -1,6 +1,7 @@
 use crate::db::DbHandler;
 use eframe::egui::{Response, Ui};
 
+/// Represents a card with a label, id, checked status, and number of duplicates.
 #[derive(Debug)]
 pub struct Card {
     pub label: u32,
@@ -10,6 +11,18 @@ pub struct Card {
 }
 
 impl Card {
+    /// Creates a new `Card` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `label` - A `u32` representing the label of the card.
+    /// * `id` - A `u32` representing the unique identifier of the card.
+    /// * `checked` - A `bool` indicating whether the card is checked (collected).
+    /// * `duplicates` - A `u32` representing the number of duplicates of the card.
+    ///
+    /// # Returns
+    ///
+    /// * `Self` - A new instance of `Card`.
     pub fn new(label: u32, id: u32, checked: bool, duplicates: u32) -> Self {
         Self {
             label,
@@ -18,6 +31,13 @@ impl Card {
             duplicates,
         }
     }
+    /// Adds a context menu to the card (right click menu).
+    /// This menu handles the number of duplicates of a card.
+    ///
+    /// # Arguments
+    ///
+    /// * `response` - A `Response` object from the UI.
+    /// * `db_handler` - A reference to the `DbHandler` for database operations.
     fn add_context_menu(&mut self, response: Response, db_handler: &DbHandler) {
         response.id.with(self.id);
         response.context_menu(|ui| {
@@ -41,6 +61,12 @@ impl Card {
         });
     }
 
+    /// Renders the UI element corresponding to this card.
+    ///
+    /// # Arguments
+    ///
+    /// * `ui` - A mutable reference to the parent `Ui` object for rendering.
+    /// * `db_handler` - A reference to the `DbHandler` for database operations.
     pub fn ui(&mut self, ui: &mut Ui, db_handler: &DbHandler) {
         let container_response = ui.vertical_centered(|ui| {
             let mut responses = vec![];

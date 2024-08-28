@@ -3,12 +3,19 @@ use crate::card::Card;
 use crate::collection::Collection;
 use crate::db::DbHandler;
 
+/// A struct that represents the settings for a collection.
+/// It used for filtering and deleting collections
 pub struct CollectionSettings {
     pub show_collected: bool,
     pub show_not_collected: bool,
 }
 
 impl CollectionSettings {
+    /// Creates a new `CollectionSettings` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `Self` - A new instance of `CollectionSettings`.
     pub fn new() -> Self {
         Self {
             show_collected: true,
@@ -16,6 +23,16 @@ impl CollectionSettings {
         }
     }
 
+    /// Renders the collection settings UI.
+    ///
+    /// # Arguments
+    ///
+    /// * `ui` - A mutable reference to the parent `Ui` object for rendering.
+    /// * `db_handler` - A reference to the `DbHandler` for database operations.
+    /// * `collections` - A mutable reference to a vector of `Collection` objects.
+    /// * `cards` - A mutable reference to a vector of `Card` objects of the currently selected collection.
+    /// * `selected_collection` - A mutable reference to an `Option<u32>` representing the selected collection's ID.
+    /// * `selected_collection_name` - A mutable reference to an `Option<String>` representing the selected collection's name.
     pub fn ui(&mut self, ui: &mut Ui, db_handler: &DbHandler, collections: &mut Vec<Collection>,
               cards: &mut Vec<Card>,
               selected_collection: &mut Option<u32>,

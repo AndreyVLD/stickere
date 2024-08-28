@@ -7,6 +7,8 @@ use crate::collection_settings::CollectionSettings;
 use crate::db::DbHandler;
 use crate::card_adder::CardAdder;
 
+/// A struct that represents the main application.
+/// It holds the UI state of the application.
 pub struct App {
     db_handler: DbHandler,
     cards: Vec<Card>,
@@ -19,6 +21,16 @@ pub struct App {
 }
 
 impl App {
+    /// Creates a new `App` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `_cc` - A reference to the `eframe::CreationContext`.
+    /// * `db_handler` - A `DbHandler` instance for database operations.
+    ///
+    /// # Returns
+    ///
+    /// * `Self` - A new instance of `App`.
     pub fn new(_cc: &eframe::CreationContext<'_>, db_handler: DbHandler) -> Self {
         // Customize egui here with cc. egui_ctx. set_fonts and cc. egui_ctx. set_visuals.
         // Restore app state using cc. storage (requires the "persistence" feature).
@@ -37,6 +49,14 @@ impl App {
         }
     }
 
+
+    /// Renders the card grid UI.
+    /// This grid contains all the cards of a selected card collection
+    ///
+    /// # Arguments
+    ///
+    /// * `ui` - A mutable reference to the parent `Ui` object for rendering.
+    /// * `available_height` - A `f32` representing the available height for the card grid.
     fn card_grid(&mut self, ui: &mut Ui, available_height: f32) {
         let available_width = ui.available_width();
         let item_width = 40.0;
@@ -78,6 +98,15 @@ impl App {
             });
     }
 
+    /// Renders the right section of the UI.
+    /// This section contains:
+    /// - collection settings.
+    /// - the grid of cards of the selected collection.
+    /// - the card adder for adding new card to the collection.
+    ///
+    /// # Arguments
+    ///
+    /// * `ui` - A mutable reference to the parent `Ui` object for rendering.
     fn right_section(&mut self, ui: &mut Ui) {
         ui.vertical(|ui| {
             if let Some(selected_id) = self.selected_collection_id {
@@ -101,6 +130,14 @@ impl App {
         });
     }
 
+    /// Renders the left section of the UI.
+    /// It contains:
+    /// - Collection adder component that adds new collections with name and size.
+    /// - List of all the collections in the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `ui` - A mutable reference to the `Ui` object for rendering.
     fn left_section(&mut self, ui: &mut Ui) {
         ui.allocate_ui_with_layout(
             Vec2::new(ui.available_width(), ui.available_height()),
@@ -134,6 +171,11 @@ impl App {
         );
     }
 
+    /// Renders the main layout of the UI.
+    ///
+    /// # Arguments
+    ///
+    /// * `ui` - A mutable reference to the `Ui` object for rendering.
     fn main_layout(&mut self, ui: &mut Ui) {
         ui.heading("Stickere mele");
         ui.separator();
@@ -152,6 +194,12 @@ impl App {
 
 
 impl eframe::App for App {
+    /// Updates the application state and renders the UI.
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx` - A reference to the `Context` object for rendering.
+    /// * `_frame` - A mutable reference to the `eframe::Frame` object.
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         CentralPanel::default().show(ctx, |ui| {
             self.main_layout(ui);

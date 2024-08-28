@@ -3,17 +3,32 @@ use rusqlite::{params, Connection};
 use crate::card::Card;
 use crate::collection::Collection;
 
+/// A struct that handles database operations.
 pub struct DbHandler {
     connection: Connection,
 }
 
 impl DbHandler {
+    /// Creates a new `DbHandler` instance and initializes the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `db_path` - A string slice that holds the path to the database file.
+    ///
+    /// # Returns
+    ///
+    /// * `DbHandler` - A new instance of `DbHandler`.
     pub fn new(db_path: &str) -> DbHandler {
         let connection = Connection::open(db_path).expect("Database Connection failed");
         Self::init(&connection);
         Self { connection }
     }
 
+    /// Initializes the database by creating necessary tables if they do not exist.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A reference to the `Connection` object.
     fn init(conn: &Connection) {
         conn.execute(
             "CREATE TABLE IF NOT EXISTS collections (
@@ -33,6 +48,11 @@ impl DbHandler {
         )", ()).expect("Table creation cards failed");
     }
 
+    /// Retrieves all collections from the database.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<Collection>` - A vector of `Collection` objects.
     pub fn get_collections(&self) -> Vec<Collection> {
         let mut stmt = self.connection
             .prepare("SELECT id, name, size FROM collections")
@@ -48,6 +68,15 @@ impl DbHandler {
         iter.flatten().collect()
     }
 
+    /// Retrieves all cards from a specific collection.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - A `u32` representing the collection identifier.
+    ///
+    /// # Returns
+    ///
+    /// * `Vec<Card>` - A vector of `Card` objects.
     pub fn get_cards_from_collection(&self, id: u32) -> Vec<Card> {
         let mut stmt = self.connection
             .prepare("SELECT * FROM cards WHERE collection_id = ?1 ORDER BY card_number")
@@ -67,6 +96,12 @@ impl DbHandler {
         iter.flatten().collect()
     }
 
+    /// Updates the collected status of a card.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - A `u32` representing the card identifier.
+    /// * `status` - A `bool` representing the collected status.
     pub fn update_card(&self, id: u32, status: bool) {
         let mut stmt = self.connection
             .prepare("UPDATE cards SET collected = ?1 WHERE id = ?2 ")
@@ -75,6 +110,16 @@ impl DbHandler {
         stmt.execute((status, id)).expect("Query Failed");
     }
 
+    /// Generates cards for a specific collection.
+    ///
+    /// # Arguments
+    ///
+    /// * `collection_id` - A `u32` representing the collection identifier.
+    /// * `size` - A `u32` representing the number of cards to generate.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<(), rusqlite::Error>` - A result indicating success or failure.
     fn generate_cards(&mut self, collection_id: u32, size: u32) -> Result<(), rusqlite::Error> {
         let tx = self.connection.transaction()?;
 
@@ -91,6 +136,16 @@ impl DbHandler {
         Ok(())
     }
 
+    /// Adds a new collection to the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - A reference to a `String` representing the collection name.
+    /// * `size` - A `u32` representing the number of cards in the collection.
+    ///
+    /// # Returns
+    ///
+    /// * `u32` - The identifier of the newly added collection.
     pub fn add_collection(&mut self, name: &String, size: u32) -> u32 {
         let last_id: u32 = {
             let mut stmt = self.connection
@@ -110,6 +165,11 @@ impl DbHandler {
         last_id
     }
 
+    /// Deletes a collection and its associated cards from the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `collection_id` - A `u32` representing the collection identifier.
     pub fn delete_collection(&self, collection_id: u32) {
         self.connection.execute("DELETE FROM cards WHERE collection_id = ?1", [collection_id])
             .expect("Query Failed");
@@ -117,6 +177,15 @@ impl DbHandler {
             .expect("Query Failed");
     }
 
+    /// Retrieves the name of a specific collection.
+    ///
+    /// # Arguments
+    ///
+    /// * `collection_id` - A `u32` representing the collection identifier.
+    ///
+    /// # Returns
+    ///
+    /// * `String` - The name of the collection.
     pub fn get_collection_name(&self, collection_id: u32) -> String {
         let mut stmt = self.connection
             .prepare("SELECT name FROM collections WHERE id = ?1")
@@ -127,6 +196,15 @@ impl DbHandler {
         }).expect("Query Failed")
     }
 
+    /// Retrieves the maximum card number for a specific collection.
+    ///
+    /// # Arguments
+    ///
+    /// * `collection_id` - A `u32` representing the collection identifier.
+    ///
+    /// # Returns
+    ///
+    /// * `u32` - The maximum card number in the collection.
     pub fn get_max_label_for_collection(&self, collection_id: u32) -> u32 {
         let mut stmt = self.connection.prepare(
             "SELECT max(card_number) FROM cards WHERE collection_id = ?1"
@@ -135,6 +213,16 @@ impl DbHandler {
         stmt.query_row([collection_id], |row| row.get(0)).unwrap_or(0)
     }
 
+    /// Adds a new card to a specific collection.
+    ///
+    /// # Arguments
+    ///
+    /// * `card_number` - A `u32` representing the card number.
+    /// * `collection_id` - A `u32` representing the collection identifier.
+    ///
+    /// # Returns
+    ///
+    /// * `u32` - The identifier of the newly added card.
     pub fn add_card(&self, card_number: u32, collection_id: u32) -> u32 {
         self.connection.execute("INSERT INTO cards (collection_id, card_number, collected) VALUES (?1,?2,?3)",
                                 params![collection_id,card_number,0]).expect("Query Failed");
@@ -148,6 +236,11 @@ impl DbHandler {
         }).expect("Query Failed")
     }
 
+    /// Updates the number of duplicates for a specific card.
+    ///
+    /// # Arguments
+    ///
+    /// * `card` - A mutable reference to the `Card` object that needs updated.
     pub fn update_card_duplicates(&self, card: &mut Card) {
         self.connection.execute("UPDATE cards SET duplicates = ?1 WHERE id = ?2", [card.duplicates, card.id])
             .expect("Query Failed");

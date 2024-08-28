@@ -2,12 +2,19 @@ use eframe::egui::{Button, Color32, DragValue, FontId, RichText, TextEdit, Ui};
 use crate::collection::Collection;
 use crate::db::DbHandler;
 
+/// A struct that represents the collection adder UI component.
+/// It is used for adding new collection into the system
 pub struct CollectionAdder {
     collection_name: String,
     size: u32,
 }
 
 impl CollectionAdder {
+    /// Creates a new `CollectionAdder` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `Self` - A new instance of `CollectionAdder`.
     pub fn new() -> Self {
         Self {
             collection_name: String::new(),
@@ -15,6 +22,13 @@ impl CollectionAdder {
         }
     }
 
+    /// Renders the collection adder UI.
+    ///
+    /// # Arguments
+    ///
+    /// * `ui` - A mutable reference to the parent `Ui` object for rendering.
+    /// * `collections` - A mutable reference to a vector of `Collection` objects.
+    /// * `db_handler` - A mutable reference to the `DbHandler` for database operations.
     pub fn ui(&mut self, ui: &mut Ui, collections: &mut Vec<Collection>, db_handler: &mut DbHandler) {
         ui.label("Aduaga un nou catalog:");
         ui.add_space(5.0);
@@ -43,6 +57,12 @@ impl CollectionAdder {
         ui.add_space(5.0);
     }
 
+    /// Adds a new collection to the list of collections.
+    ///
+    /// # Arguments
+    ///
+    /// * `collections` - A mutable reference to a vector of `Collection` objects.
+    /// * `db_handler` - A mutable reference to the `DbHandler` for database operations.
     fn add_collection(&mut self, collections: &mut Vec<Collection>, db_handler: &mut DbHandler) {
         let name = self.collection_name.trim().to_string();
         if !name.is_empty() {
