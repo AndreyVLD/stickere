@@ -27,11 +27,11 @@ impl CardAdder {
 
         ui.horizontal_centered(|ui| {
             ui.add(TextEdit::singleline(&mut self.card_label)
-                .hint_text("Enter card number or leave blank")
+                .hint_text("Numarul unui sticker sau lasa gol")
                 .desired_width(200.0));
 
             let trimmed_text = self.card_label.trim();
-            if ui.button("Add Card").clicked() {
+            if ui.button("Adauga Sticker").clicked() {
                 match trimmed_text.parse::<u32>() {
                     Ok(label) => self.add_new_card(label, collection_id, db_handler, cards),
                     Err(_) => {

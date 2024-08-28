@@ -20,13 +20,13 @@ impl CollectionSettings {
               cards: &mut Vec<Card>,
               selected_collection: &mut Option<u32>,
               selected_collection_name: &mut Option<String>) {
-        ui.label("Filter cards:");
+        ui.label("Filtreaza stickere:");
         ui.add_space(5.0);
 
         ui.horizontal(|ui| {
             ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
-                ui.checkbox(&mut self.show_collected, "Collected");
-                ui.checkbox(&mut self.show_not_collected, "Not Collected");
+                ui.checkbox(&mut self.show_collected, "Colectate");
+                ui.checkbox(&mut self.show_not_collected, "Necolectate");
             });
 
 
@@ -39,7 +39,6 @@ impl CollectionSettings {
 
                 if ui.add_sized([30.0, 30.0], delete_button).clicked() {
                     if let &mut Some(selected_collection_id) = selected_collection {
-                        println!("Collection {selected_collection_id} deletion button clicked!");
                         db_handler.delete_collection(selected_collection_id);
                         *selected_collection = None;
                         *selected_collection_name = None;
@@ -48,7 +47,7 @@ impl CollectionSettings {
                     }
                 }
 
-                ui.label("Delete Collection");
+                ui.label("Sterge catalogul");
             });
         });
     }

@@ -45,7 +45,7 @@ impl App {
 
         let name = match &self.selected_collection_name {
             Some(x) => x.to_owned(),
-            None => "Cards".to_string()
+            None => "Carduri".to_string()
         };
 
         ui.label(name + ":");
@@ -117,7 +117,7 @@ impl App {
                         .id_source("CollectionsArea")
                         .auto_shrink([false; 2])
                         .show(ui, |ui| {
-                            ui.label("Collections:");
+                            ui.label("Cataloage:");
 
                             ui.add_space(5.0);
 
@@ -135,7 +135,7 @@ impl App {
     }
 
     fn main_layout(&mut self, ui: &mut Ui) {
-        ui.heading("My Application");
+        ui.heading("Stickere mele");
         ui.separator();
 
         let available_height = ui.available_height();

@@ -22,9 +22,9 @@ impl Card {
         response.id.with(self.id);
         response.context_menu(|ui| {
             ui.vertical(|ui| {
-                ui.label(format!("Duplicates: {}", self.duplicates));
+                ui.label(format!("Dubluri: {}", self.duplicates));
 
-                if ui.button("Add Duplicates").clicked() {
+                if ui.button("Adauga dublura").clicked() {
                     self.duplicates += 1;
                     db_handler.update_card_duplicates(self);
                     ui.close_menu();
@@ -32,7 +32,7 @@ impl Card {
 
                 ui.separator();
 
-                if self.duplicates >= 1 && ui.button("Remove Duplicates").clicked() {
+                if self.duplicates >= 1 && ui.button("Sterge dublura").clicked() {
                     self.duplicates -= 1;
                     db_handler.update_card_duplicates(self);
                     ui.close_menu();

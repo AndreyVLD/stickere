@@ -16,10 +16,10 @@ impl CollectionAdder {
     }
 
     pub fn ui(&mut self, ui: &mut Ui, collections: &mut Vec<Collection>, db_handler: &mut DbHandler) {
-        ui.label("Add New Collection:");
+        ui.label("Aduaga un nou catalog:");
         ui.add_space(5.0);
 
-        ui.add(TextEdit::singleline(&mut self.collection_name).hint_text("Enter collection name"));
+        ui.add(TextEdit::singleline(&mut self.collection_name).hint_text("Numele catalogului"));
 
         ui.add_space(10.0);
         ui.horizontal(|ui| {

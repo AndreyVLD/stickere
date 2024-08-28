@@ -20,7 +20,7 @@ fn main() -> eframe::Result {
             .with_position(pos2(100.0, 100.0)),
         ..eframe::NativeOptions::default()
     };
-    eframe::run_native("My egui App",
+    eframe::run_native("Manager de stickere",
                        native_options,
                        Box::new(|cc| Ok(Box::new(App::new(cc, db)))))
 }
