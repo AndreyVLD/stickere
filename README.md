@@ -51,7 +51,7 @@ git clone https://github.com/AndreyVLD/stickere.git
 2. Navigate to the project directory:
 
 ```bash
-cd sticker-management-application
+cd stickere
 ```
 
 3. Build the project:
