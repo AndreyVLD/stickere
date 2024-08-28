@@ -27,7 +27,7 @@ The application leverages the `eframe` and `egui` libraries for the UI and `rusq
 - **Update Card Status:** Users can update the collected status of individual cards.
 - **Manage Duplicates:** Users can view and update the number of duplicates for each card.
 
-## User Interface
+### User Interface
 
 - **Popup Notifications:** The application provides popup notifications for various actions, such as adding or deleting
   collections.
