@@ -1,3 +1,4 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod db;
 mod ui;
 mod card;
@@ -6,7 +7,6 @@ mod collection_adder;
 mod collection_settings;
 mod card_adder;
 mod ui_utils;
-
 use eframe::egui::{pos2, vec2, ViewportBuilder};
 use crate::db::DbHandler;
 use crate::ui::App;
@@ -28,7 +28,7 @@ fn main() -> eframe::Result {
             .with_position(pos2(100.0, 100.0)),
         ..eframe::NativeOptions::default()
     };
-    
+
     // Run the eframe application with the specified title, native options, and application instance.
     eframe::run_native("Manager de stickere",
                        native_options,

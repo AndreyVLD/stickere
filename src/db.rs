@@ -1,3 +1,5 @@
+use std::path::Path;
+use std::fs;
 use rusqlite::{params, Connection};
 
 use crate::card::Card;
@@ -19,6 +21,14 @@ impl DbHandler {
     ///
     /// * `DbHandler` - A new instance of `DbHandler`.
     pub fn new(db_path: &str) -> DbHandler {
+        if let Some(parent_dir) = Path::new(db_path).parent() {
+            // Check if the directory exists
+            if !parent_dir.exists() {
+                // Create the directory if it doesn't exist
+                fs::create_dir_all(parent_dir).expect("Failed to create directory");
+            }
+        }
+        
         let connection = Connection::open(db_path).expect("Database Connection failed");
         Self::init(&connection);
         Self { connection }
